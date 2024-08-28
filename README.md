@@ -1,6 +1,6 @@
 # HonigSchleppElesl
 Turntable addon for the HaniMandl
 
-![Schleppi_1](./Pictures/IMG_20240804_221943093.jpg)
+![Schleppi_1](./Hardware/Case/Pictures/Drehteller.JPG)
 
 dev version
