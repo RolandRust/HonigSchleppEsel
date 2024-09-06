@@ -8,6 +8,15 @@
 ### HTD3_80_6.5
 ![bottom_middle](./Pictures/3D-Parts/Bottom_Middle/HTD3_80_6.5.JPG)
 
+## Bottom assembly
+![bottom_middle](./Pictures/3D-Parts/Bottom.JPG)
+### Bottom_Out
+![bottom_middle](./Pictures/3D-Parts/Bottom/Bottom_Out.JPG)
+### Bottom_Out_Scale
+![bottom_middle](./Pictures/3D-Parts/Bottom/Bottom_Out_Scale.JPG)
+### Scale_Top
+![bottom_middle](./Pictures/3D-Parts/Bottom/Scale_Top.JPG)
+
 ## 	Roll holder assembly
 ![roll_holder](./Pictures/3D-Parts/Rollenhalter.JPG)
 ### Rollenhalter_klein
