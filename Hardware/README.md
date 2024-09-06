@@ -1,5 +1,5 @@
 # Hardware
-## Bottom middle assembly
+## Bottom middle assemblyhttps://github.com/RolandRust/HonigSchleppElesl/blob/main/Hardware/README.md
 ![bottom_middle](./Pictures/3D-Parts/Bottom_Middle.JPG)
 ### Bottom_Middle
 ![bottom_middle](./Pictures/3D-Parts/Bottom_Middle/Bottom_Middle.JPG)
@@ -29,3 +29,25 @@
 ![bottom_middle](./Pictures/3D-Parts/Bottom_Top/Top_Ring_Smal_Inside.JPG)
 ### Top_Ring_Small_Outer
 ![bottom_middle](./Pictures/3D-Parts/Bottom_Top/Top_Ring_Small_Outer.JPG)
+
+## 	Wall inside assembly
+![roll_holder](./Pictures/3D-Parts/Wall_Inside.JPG)
+### Wall_Inside
+![bottom_middle](./Pictures/3D-Parts/Wall_Inside/Wall_Inside.JPG)
+
+## 	Wall outside assembly
+![roll_holder](./Pictures/3D-Parts/Wall_Outside.JPG)
+### Wall_Inside
+![bottom_middle](./Pictures/3D-Parts/Wall_Outside/Wall_Outside.JPG)
+
+
+
+
+
+
+
+
+
+
+
+
