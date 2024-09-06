@@ -9,46 +9,63 @@
 ![bottom_middle](./Pictures/3D-Parts/Bottom_Middle/HTD3_80_6.5.JPG)
 
 ## Bottom assembly
-![bottom_middle](./Pictures/3D-Parts/Bottom.JPG)
+![bottom](./Pictures/3D-Parts/Bottom.JPG)
 ### Bottom_Out
-![bottom_middle](./Pictures/3D-Parts/Bottom/Bottom_Out.JPG)
+![bottom](./Pictures/3D-Parts/Bottom/Bottom_Out.JPG)
 ### Bottom_Out_Scale
-![bottom_middle](./Pictures/3D-Parts/Bottom/Bottom_Out_Scale.JPG)
+![bottom](./Pictures/3D-Parts/Bottom/Bottom_Out_Scale.JPG)
 ### Scale_Top
-![bottom_middle](./Pictures/3D-Parts/Bottom/Scale_Top.JPG)
+![bottom](./Pictures/3D-Parts/Bottom/Scale_Top.JPG)
 
 ## 	Roll holder assembly
 ![roll_holder](./Pictures/3D-Parts/Rollenhalter.JPG)
 ### Rollenhalter_klein
-![bottom_middle](./Pictures/3D-Parts/Rollenhalter/Rollenhalter_klein.JPG)
+![roll_holder](./Pictures/3D-Parts/Rollenhalter/Rollenhalter_klein.JPG)
 ### Rolle
-![bottom_middle](./Pictures/3D-Parts/Rollenhalter/Rolle.JPG)
+![roll_holder](./Pictures/3D-Parts/Rollenhalter/Rolle.JPG)
 ### Zylinder_Stift
-![bottom_middle](./Pictures/3D-Parts/Rollenhalter/Zilinder_Stift.JPG)
+![roll_holder](./Pictures/3D-Parts/Rollenhalter/Zilinder_Stift.JPG)
 
 ## 	Bottom top assembly
-![roll_holder](./Pictures/3D-Parts/Bottom_Top.JPG)
+![bottom_top](./Pictures/3D-Parts/Bottom_Top.JPG)
 ### Top_Scale
-![bottom_middle](./Pictures/3D-Parts/Bottom_Top/Top_Scale.JPG)
+![bottom_top](./Pictures/3D-Parts/Bottom_Top/Top_Scale.JPG)
 ### Top_Ring_Big_Inside
-![bottom_middle](./Pictures/3D-Parts/Bottom_Top/Top_Ring_Big_Inside.JPG)
+![bottom_top](./Pictures/3D-Parts/Bottom_Top/Top_Ring_Big_Inside.JPG)
 ### Top_Ring_Big_Outer
-![bottom_middle](./Pictures/3D-Parts/Bottom_Top/Top_Ring_Big_Outer.JPG)
+![bottom_top](./Pictures/3D-Parts/Bottom_Top/Top_Ring_Big_Outer.JPG)
 ### Top_Ring_Smal_Inside
-![bottom_middle](./Pictures/3D-Parts/Bottom_Top/Top_Ring_Smal_Inside.JPG)
+![bottom_top](./Pictures/3D-Parts/Bottom_Top/Top_Ring_Smal_Inside.JPG)
 ### Top_Ring_Small_Outer
-![bottom_middle](./Pictures/3D-Parts/Bottom_Top/Top_Ring_Small_Outer.JPG)
+![bottom_top](./Pictures/3D-Parts/Bottom_Top/Top_Ring_Small_Outer.JPG)
 
 ## 	Wall inside assembly
-![roll_holder](./Pictures/3D-Parts/Wall_Inside.JPG)
+![wall_inside](./Pictures/3D-Parts/Wall_Inside.JPG)
 ### Wall_Inside
-![bottom_middle](./Pictures/3D-Parts/Wall_Inside/Wall_Inside.JPG)
+![wall_inside](./Pictures/3D-Parts/Wall_Inside/Wall_Inside.JPG)
 
 ## 	Wall outside assembly
-![roll_holder](./Pictures/3D-Parts/Wall_Outside.JPG)
+![wall_outside](./Pictures/3D-Parts/Wall_Outside.JPG)
 ### Wall_Inside
-![bottom_middle](./Pictures/3D-Parts/Wall_Outside/Wall_Outside.JPG)
+![wall_outside](./Pictures/3D-Parts/Wall_Outside/Wall_Outside.JPG)
 
+## 	Top
+![top](./Pictures/3D-Parts/Top.JPG)
+### Top_Mittelteil_Drehelement
+![top](./Pictures/3D-Parts/Top/Top_Mittelteil_Drehelement.JPG)
+### Top_Jar_Mover_1
+![top](./Pictures/3D-Parts/Top/Top_Jar_Mover_1.JPG)
+### Top_Jar_Mover_2
+![top](./Pictures/3D-Parts/Top/Top_Jar_Mover_2.JPG)
+### Top_Holm
+![top](./Pictures/3D-Parts/Top/Top_Holm.JPG)
+
+## 	Front box
+![front_box](./Pictures/3D-Parts/Front.JPG)
+### Box_Bottom
+![front_box](./Pictures/3D-Parts/Front_Box/Box_Bottom.JPG)
+### Box_Top
+![front_box](./Pictures/3D-Parts/Front_Box/Box_Top.JPG)
 
 
 
