@@ -1,2 +1,2 @@
 # Schematic
-![schematic](Drehteller_02.pdf)
+![schematic](../Pictures/PCB/Drehteller_02_Schematic.jpg)
