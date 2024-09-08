@@ -67,6 +67,22 @@
 ### Box_Top
 ![front_box](./Pictures/3D-Parts/Front_Box/Box_Top.JPG)
 
+## 	Gear box
+![gear_box](./Pictures/3D-Parts/GerBox.JPG)
+### Carrier_Plate
+![gear_box](./Pictures/3D-Parts/GearBox/Carrier_Plate.JPG)
+### Ring
+![gear_box](./Pictures/3D-Parts/GearBox/Ring.JPG)
+### Gear_Planet_0.5
+![gear_box](./Pictures/3D-Parts/GearBox/Gear_Planet_0.5.JPG)
+###Gear_Stepper_0.5
+![gear_box](./Pictures/3D-Parts/GearBox/Gear_Stepper_0.5.JPG)
+
+## Fixes
+### FIX_1
+![fixes](./Pictures/3D-Parts/Fixes/FIX_1.JPG)
+### FIX_2
+![fixes](./Pictures/3D-Parts/Fixes/FIX_2.JPG)
 
 
 
