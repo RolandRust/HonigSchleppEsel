@@ -1,2 +1,2 @@
 # Schematic
-![schematic](./Drehteller_02.pdf)
+![schematic](Drehteller_02.pdf)
