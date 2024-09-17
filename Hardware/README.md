@@ -28,25 +28,25 @@
 
 ## 	Bottom top assembly
 ![bottom_top](./Pictures/3D-Parts/Bottom_Top_V2.JPG)
-### Top_Scale
+### Top_Scale_V2
 ![bottom_top](./Pictures/3D-Parts/Bottom_Top/Top_Scale_V2.JPG)
-### Top_Ring_Big_Inside
+### Top_Ring_Big_Inside_V2
 ![bottom_top](./Pictures/3D-Parts/Bottom_Top/Top_Ring_Big_Inside_V2.JPG)
-### Top_Ring_Big_Outer
+### Top_Ring_Big_Outer_V2
 ![bottom_top](./Pictures/3D-Parts/Bottom_Top/Top_Ring_Big_Outer_V2.JPG)
-### Top_Ring_Small_Inside
+### Top_Ring_Small_Inside_V2
 ![bottom_top](./Pictures/3D-Parts/Bottom_Top/Top_Ring_Small_Inside_V2.JPG)
-### Top_Ring_Small_Outer
+### Top_Ring_Small_Outer_V2
 ![bottom_top](./Pictures/3D-Parts/Bottom_Top/Top_Ring_Small_Outer_V2.JPG)
 
 ## 	Wall inside assembly
 ![wall_inside](./Pictures/3D-Parts/Wall_Inside_V2.JPG)
-### Wall_Inside
+### Wall_Inside_V2
 ![wall_inside](./Pictures/3D-Parts/Wall_Inside/Wall_Inside_V2.JPG)
 
 ## 	Wall outside assembly
 ![wall_outside](./Pictures/3D-Parts/Wall_Outside_V2.JPG)
-### Wall_Inside
+### Wall_Inside_V2
 ![wall_outside](./Pictures/3D-Parts/Wall_Outside/Wall_Outside_V2.JPG)
 
 ## 	Top
