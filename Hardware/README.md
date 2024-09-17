@@ -34,8 +34,8 @@
 ![bottom_top](./Pictures/3D-Parts/Bottom_Top/Top_Ring_Big_Inside_V2.JPG)
 ### Top_Ring_Big_Outer
 ![bottom_top](./Pictures/3D-Parts/Bottom_Top/Top_Ring_Big_Outer_V2.JPG)
-### Top_Ring_Smal_Inside
-![bottom_top](./Pictures/3D-Parts/Bottom_Top/Top_Ring_Smal_Inside_V2.JPG)
+### Top_Ring_Small_Inside
+![bottom_top](./Pictures/3D-Parts/Bottom_Top/Top_Ring_Small_Inside_V2.JPG)
 ### Top_Ring_Small_Outer
 ![bottom_top](./Pictures/3D-Parts/Bottom_Top/Top_Ring_Small_Outer_V2.JPG)
 
