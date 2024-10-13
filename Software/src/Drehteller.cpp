@@ -5,18 +5,17 @@
 #include <esp_wifi.h>
 #include <Preferences.h>
 #include <ESP32Servo.h>
-#include <Arduino_GFX_Library.h>
-#include <U8g2lib.h>
 #include <SPI.h>
 
 String version = "0.0.1";
 
-//#define DEBUG
+#define DEBUG
 #define READ_PREFERENCES
 #define USE_DISPLAY 1               // 0 = no display conected, 1 = display conected
 #define USE_INIT_CORR 1             // 0 = no init correctur, 1 = init correctur (can be usefull if the gear is 3D ptinted)
 #define CHANGE_MAC_ADDRESS_HM 1     // HaniMandl: 0 = do not change the mac address, 1 = change the mac address
 #define CHANGE_MAC_ADDRESS_TT 1     // Turntable: 0 = do not change the mac address, 1 = change the mac address
+#define OTA_UPDATE 1                // 0: OTA update disabled, 1: OTA update enabled
 
 Preferences preferences;
 
@@ -43,6 +42,8 @@ Servo servo;
 
 //Display
 #if USE_DISPLAY == 1
+  #include <Arduino_GFX_Library.h>
+  #include <U8g2lib.h>
   Arduino_DataBus *bus = new Arduino_HWSPI(17 /* DC */, 5 /* CS */);
   //Arduino_GFX *gfx = new Arduino_ST7789(bus, -1 /* RST */, 3 /* rotation */);
   Arduino_GFX *gfx = new Arduino_ST7789(bus, 14 /* RST */, 3 /* rotation */);
@@ -70,6 +71,21 @@ Servo servo;
 #if USE_DISPLAY == 1
   unsigned long  BACKGROUND = 0x0000;
   unsigned long  TEXT = 0xFFFF;
+#endif
+
+//OTA
+int channel = 1;  //default channel if ESPNOW don't connect with a acces point
+#if OTA_UPDATE == 1
+  #include "./Resources/wifi.h"
+  #include <WiFi.h>
+  #include <WiFiClient.h>
+  #include <WebServer.h>
+  #include <ElegantOTA.h>                 /* aus dem Bibliotheksverwalter */
+  WebServer server(80);
+  unsigned long ota_progress_millis = 0;
+  char ausgabe[30];
+  bool ota_done = false;
+  //void OTASetup(void);
 #endif
 
 //Pin Positionsswitch
@@ -104,6 +120,7 @@ bool esp_now_msg_recived = false;
 bool esp_now_send_error = true;
 //bool esp_now_message_processed = false;
 char esp_now_msg[] = "";
+bool ota_update = false;
 
 //ESP NOW
 typedef struct messageToBeSent {
@@ -129,6 +146,8 @@ int get_lenght(int i) {
     else if (i < 10000) {res = 4;}
     else if (i < 100000) {res = 5;}
     return res;
+  #else
+    return 0;  //nur damit der compiler keine Warnung ausspuckt beil Kompilieren
   #endif
 }
 
@@ -674,6 +693,129 @@ void close_drop_protection(int waittime) {
   }
 }
 
+void move_tp(int dp_angle) {
+  move_tp_done = false;
+  SERVO_WRITE(dp_angle);
+  if (dp_angle-5 <= servo.read() <= dp_angle+5) {move_tp_done = true;}
+  #ifdef DEBUG
+    Serial.print("dp_angle: "); Serial.print(dp_angle); Serial.print(" - "); Serial.println(servo.read());
+  #endif
+}
+
+//OTA
+#if OTA_UPDATE == 1
+  void onOTAStart() {
+    strcpy(myMessageToBeSent.text, "OTAStart");
+    myMessageToBeSent.value = 0;
+    sendMessage();
+    #ifdef DEBUG
+      Serial.println("OTA update started!");
+    #endif
+  }
+
+  void onOTAProgress(size_t current, size_t final) {
+    if (millis() - ota_progress_millis > 1000) {
+      ota_progress_millis = millis();
+      //strcpy(myMessageToBeSent.text, current);
+      sprintf(myMessageToBeSent.text, "%u", current);
+      myMessageToBeSent.value = final;
+      sendMessage();
+      #ifdef DEBUG
+        Serial.printf("OTA Progress Current: %u bytes, Final: %u bytes\n", current, final);
+      #endif
+    }
+  }
+
+  void onOTAEnd(bool success) {
+    int x_pos;
+    myMessageToBeSent.value = 0;
+    if (success) {
+      strcpy(myMessageToBeSent.text, "Success");
+      ota_done = true;
+      #ifdef DEBUG
+        Serial.println("OTA update finished successfully!");
+      #endif
+    } 
+    else {
+      strcpy(myMessageToBeSent.text, "Fail");
+      ota_done = true;
+      #ifdef DEBUG
+        Serial.println("There was an error during OTA update!");
+      #endif
+    }
+    sendMessage();
+  }
+
+  void OTAdisconnect(void) {
+    #ifdef DEBUG
+      Serial.println("OTAdisconnect");
+    #endif    
+    WiFi.disconnect();
+    delay(500);
+    while (WiFi.status() == WL_CONNECTED) {delay(500);}
+  }
+
+  void OTALoop(void) {
+    #ifdef DEBUG
+      Serial.println("OTALoop");
+    #endif
+    while (WiFi.status() == WL_CONNECTED and strcmp(myReceivedMessage.text, "stop_ota_update") != 0) {
+      server.handleClient();
+	    if (ota_done == true) {
+        delay(5000);
+        ESP.restart();
+      }
+    }
+    if (strcmp(myReceivedMessage.text, "stop_ota_update") == 0) {
+      OTAdisconnect();
+    }
+  }
+
+  void OTASetup(void) {
+    #ifdef DEBUG
+      Serial.println("OTASetup");
+    #endif
+    WiFi.mode(WIFI_STA);
+    WiFi.setSleep(false);
+    //esp_wifi_set_channel(channel, WIFI_SECOND_CHAN_NONE);
+    WiFi.begin(ssid, password);
+    unsigned long wifi_start_millis = millis();
+    while (WiFi.status() != WL_CONNECTED and millis() - wifi_start_millis < 15000 and strcmp(myReceivedMessage.text, "stop_ota_update") != 0) {
+      delay(500);
+    }
+    esp_wifi_set_channel(channel, WIFI_SECOND_CHAN_NONE);
+    if (WiFi.status() == WL_CONNECTED) {
+      server.on("/", []() {
+        sprintf(ausgabe, "Drehteller %s", version);
+        server.send(200, "text/plain", ausgabe);
+      });
+      #ifdef DEBUG
+        Serial.print("IP adress: "); Serial.println(WiFi.localIP());
+        Serial.print("SSID: ");
+        Serial.print(WiFi.SSID());
+        Serial.print(" Kanal: ");
+        Serial.println(WiFi.channel());
+      #endif
+      sprintf(myMessageToBeSent.text, "%d.%d.%d.%d", WiFi.localIP()[0], WiFi.localIP()[1], WiFi.localIP()[2], WiFi.localIP()[3]);
+      sendMessage();
+      ElegantOTA.begin(&server);
+      ElegantOTA.onStart(onOTAStart);
+      ElegantOTA.onProgress(onOTAProgress);
+      ElegantOTA.onEnd(onOTAEnd);
+      server.begin();
+    }
+    if (WiFi.status() == WL_CONNECTED and strcmp(myReceivedMessage.text, "stop_ota_update") != 0) {
+      OTALoop();
+    }
+    else {
+      #ifdef DEBUG
+        Serial.print("IP adress: "); Serial.println(WiFi.localIP());
+      #endif
+      OTAdisconnect();
+    }
+  }
+#endif
+
 void print_credits() {
   #if USE_DISPLAY == 1
     int offset = 22;
@@ -692,15 +834,51 @@ void print_credits() {
 }
 
 void setup() {
+  Serial.begin(115200);
+  while (!Serial) {}
+  #ifdef DEBUG
+    Serial.println("-- Setup loop");
+  #endif
+  //Display
   #if USE_DISPLAY == 1
     gfx->begin();
     gfx->fillScreen(BACKGROUND);
     gfx->setUTF8Print(true);
   #endif
-  Serial.begin(115200);
-  while (!Serial) {}
-  #ifdef DEBUG
-    Serial.println("-- Setup loop");
+  //OTA update
+  #if OTA_UPDATE == 1
+    ota_update = true;
+    //Kanal für WLAN suchen
+    WiFi.mode(WIFI_STA);
+    #ifdef DEBUG
+      Serial.println("Scanne nach WLAN Netzwerken...");
+    #endif
+    int n = WiFi.scanNetworks();
+    #ifdef DEBUG
+      Serial.println("Scan abgeschlossen.");
+    #endif
+    #ifdef DEBUG
+      Serial.println("Wlan Netzwerke");
+      for (int i = 0; i < n; i++) {
+        Serial.print("SSID: ");
+        Serial.print(WiFi.SSID(i));
+        Serial.print(" Kanal: ");
+        Serial.println(WiFi.channel(i));
+      }
+      Serial.println("End Wlan Netzwerke");
+    #endif
+    for (int i = 0; i < n; i++) {
+      if (WiFi.SSID(i) == ssid) {
+        channel = WiFi.channel(i);
+        #ifdef DEBUG
+          Serial.print("SSID: ");
+          Serial.print(WiFi.SSID(i));
+          Serial.print(" Kanal: ");
+          Serial.println(channel);
+        #endif
+      break; // Beende die Schleife, wenn das Netzwerk gefunden wurde
+    }
+  }
   #endif
   //set default imnputs and read preverences
   pinMode(STEP_PIN, OUTPUT);
@@ -743,6 +921,7 @@ void setup() {
     gfx->print("Setup ESPNow:");
   #endif
   WiFi.mode(WIFI_STA);
+  esp_wifi_set_channel(channel, WIFI_SECOND_CHAN_NONE);
   //change mac address
   #if CHANGE_MAC_ADDRESS_TT == 1
     uint8_t newMACAddress[] = {0x74, 0x00, 0x00, 0x00, 0x00, 0x02};
@@ -776,7 +955,7 @@ void setup() {
     esp_now_register_send_cb(messageSent);  
     esp_now_register_recv_cb(messageReceived); 
     memcpy(peerInfo.peer_addr, MacAdressHanimandl, 6);
-    peerInfo.channel = 0;
+    peerInfo.channel = channel;
     peerInfo.encrypt = false;
     if (esp_now_add_peer(&peerInfo) != ESP_OK) {
       esp_now_init_success = false;
@@ -806,14 +985,12 @@ void setup() {
       gfx->setCursor((320 - 18 * 14) / 2, 24);
       gfx->print("Honig schlepp Esel");
       gfx->drawLine(0, 30, 320, 30, TEXT);
-
       uint8_t baseMac[6];
       esp_wifi_get_mac(WIFI_IF_STA, baseMac);
       char mac_adress[30];
       sprintf(mac_adress, "%02x:%02x:%02x:%02x:%02x:%02x", baseMac[0], baseMac[1], baseMac[2], baseMac[3], baseMac[4], baseMac[5]);
       gfx->setCursor((320 - 17 * 14) / 2, 65);
       gfx->print(mac_adress);
-
       gfx->setFont(Punk_Mono_Bold_160_100);
       gfx->drawLine(0, 85, 320, 85, TEXT);
       gfx->setCursor(10, 105);
@@ -848,8 +1025,6 @@ void setup() {
 }
 
 void loop() {
-  //move_dp muss noch gemacht werden
-
   //Display
   update_display_init();
   update_display_speed_init();
@@ -861,7 +1036,12 @@ void loop() {
   update_display_dp_angle_max();
   update_display_dp_close_wait_time();
   while (esp_now_msg_recived == false) {
-    stop = false;
+    if (stop == true) {
+      delESPnowArrays();
+      strcpy(myMessageToBeSent.text, "ok_stop");
+      sendMessage();
+      stop = false;
+    }
     if (digitalRead(SWITCH) == 1 and stepper_init_done == true and strcmp(myReceivedMessage.text, "move_pos") != 0 and turntable_init_check == true and stop == false) {  //Stepper init zurücksetzen, fals einer der Drehteller von Hand verschiebt
       delay(500);
       if (digitalRead(SWITCH) == 1) {
@@ -1020,21 +1200,20 @@ void loop() {
       move_pos_done = false;
       sendMessage();
     }
-    //to do
     else if (strcmp(myReceivedMessage.text, "move_dp") == 0) {
+      int i = myReceivedMessage.value;
       update_display();
       delESPnowArrays();
-      //move_tp();
+      move_tp(i);
       if (move_tp_done == true) {strcpy(myMessageToBeSent.text, "ok_move_tp");}
       else                       {strcpy(myMessageToBeSent.text, "nok_move_tp");}
       move_tp_done = false;
       sendMessage();
     }
-    //end to do
     else if (strcmp(myReceivedMessage.text, "close_drop_prodection") == 0) {
       update_display();
       delESPnowArrays();
-      close_drop_protection(servo_wait);
+      close_drop_protection(0);
       if (drop_protection == true) {strcpy(myMessageToBeSent.text, "ok_close_dp");}
       else                         {strcpy(myMessageToBeSent.text, "nok_close_dp");}
       sendMessage();
@@ -1061,6 +1240,28 @@ void loop() {
       strcpy(myMessageToBeSent.text, "ok_off_init_check");
       sendMessage();
     }
+    else if (strcmp(myReceivedMessage.text, "ota_update_status") == 0) {
+      update_display();
+      delESPnowArrays();
+      strcpy(myMessageToBeSent.text, "ok_ota_update_status");
+      myMessageToBeSent.value = ota_update;
+      sendMessage();
+    }
+    #if OTA_UPDATE == 1
+      else if (strcmp(myReceivedMessage.text, "enable_ota_update") == 0) {
+        update_display();
+        delESPnowArrays();
+        OTASetup();
+        ota_done = false;
+      }
+      else if (strcmp(myReceivedMessage.text, "stop_ota_update") == 0) {
+        update_display();
+        delESPnowArrays();
+        strcpy(myMessageToBeSent.text, "ok_stop_ota_update");
+        sendMessage();
+        ota_done = false;
+      }
+    #endif
   }
   if (stepper_init_done == false and move2pos_running == false and strcmp(myReceivedMessage.text, "check") != 0) {
     #ifdef DEBUG
