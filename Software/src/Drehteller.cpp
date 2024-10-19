@@ -9,13 +9,14 @@
 
 String version = "0.0.1";
 
-#define DEBUG
+//#define DEBUG
+//#define DEBUG_INI
 #define READ_PREFERENCES
 #define USE_DISPLAY 1               // 0 = no display conected, 1 = display conected
 #define USE_INIT_CORR 1             // 0 = no init correctur, 1 = init correctur (can be usefull if the gear is 3D ptinted)
 #define CHANGE_MAC_ADDRESS_HM 1     // HaniMandl: 0 = do not change the mac address, 1 = change the mac address
 #define CHANGE_MAC_ADDRESS_TT 1     // Turntable: 0 = do not change the mac address, 1 = change the mac address
-#define OTA_UPDATE 1                // 0: OTA update disabled, 1: OTA update enabled
+#define OTA_UPDATE 0                // 0: OTA update disabled, 1: OTA update enabled
 
 Preferences preferences;
 
@@ -27,8 +28,6 @@ Preferences preferences;
   const uint8_t MacAdressHanimandl[] = {0x74, 0x00, 0x00, 0x00, 0x00, 0x01};
 #endif
 esp_now_peer_info_t peerInfo;
-
-int microsteps = 8;
 
 //Pin NEMA17
 int STEP_PIN = 4;
@@ -85,7 +84,6 @@ int channel = 1;  //default channel if ESPNOW don't connect with a acces point
   unsigned long ota_progress_millis = 0;
   char ausgabe[30];
   bool ota_done = false;
-  //void OTASetup(void);
 #endif
 
 //Pin Positionsswitch
@@ -441,6 +439,9 @@ void messageReceived(const uint8_t* macAddr, const uint8_t* incomingData, int le
 
 void readPreferences() {
   #ifdef READ_PREFERENCES
+    #ifdef DEBUG
+      Serial.println("-- readPreferences");
+    #endif
     preferences.begin("EEPROM", false);
     step_center_jar  = preferences.getUInt("step_center_jar", 0);
     step_speed_init  = preferences.getUInt("step_speed_init", 0);
@@ -461,6 +462,7 @@ void readPreferences() {
       Serial.print("servo_max:  ");      Serial.println(servo_max);
       Serial.print("servo_speed:  ");    Serial.println(servo_speed);
       Serial.print("servo_wait:  ");     Serial.println(servo_wait);
+      Serial.println("-- end readPreferences");
     #endif
   #endif
 }
@@ -481,12 +483,28 @@ void stepper_init() {
   if (change_rotation) {digitalWrite(DIRECTION_PIN, HIGH);}
   else {digitalWrite(DIRECTION_PIN, LOW);}
   //Drehteller in die richtige Position bringen
+  #ifdef DEBUG_INI
+    step_counter == 0;
+    Serial.println("-- Move Stepper 200 Steps");
+    Serial.print("digitalRead(SWITCH): "); Serial.println(digitalRead(SWITCH));
+  #endif
   for (int i = 0; i < 200; i++) {
     if (stop == false) {make_step();}
   }
+  #ifdef DEBUG_INI
+    Serial.print("digitalRead(SWITCH): "); Serial.println(digitalRead(SWITCH));
+    Serial.print("step_counter:        "); Serial.println(step_counter);
+    Serial.println("-- end Move Stepper 200 Steps");
+    Serial.println("-- Find correct position");
+  #endif
   while (digitalRead(SWITCH) == 1 and stop == false) {
     make_step();
   }
+  #ifdef DEBUG_INI
+    Serial.print("digitalRead(SWITCH): "); Serial.println(digitalRead(SWITCH));
+    Serial.print("step_counter:        "); Serial.println(step_counter);
+    Serial.println("-- end Find correct position");
+  #endif
   #ifdef DEBUG
     Serial.println("Search position done");
   #endif
@@ -502,12 +520,27 @@ void stepper_init() {
       Serial.print("counter3 = "); Serial.println(counter3);
     #endif
     step_counter = 0;
+    #ifdef DEBUG_INI
+      Serial.println("-- Move Stepper 500 steps");
+      Serial.print("digitalRead(SWITCH): "); Serial.println(digitalRead(SWITCH));
+    #endif
     for (int j = 0; j < 500; j++) {
       if (stop == false) {make_step();}
     }
+    #ifdef DEBUG_INI
+      Serial.print("digitalRead(SWITCH): "); Serial.println(digitalRead(SWITCH));
+      Serial.print("step_counter:        "); Serial.println(step_counter);
+      Serial.println("-- end Move Stepper 500 steps");
+      Serial.println("-- Find correct steps to move the Jar");
+    #endif
     while (digitalRead(SWITCH) == 1 and stop == false) {
       make_step();
     }
+    #ifdef DEBUG_INI
+      Serial.print("digitalRead(SWITCH): "); Serial.println(digitalRead(SWITCH));
+      Serial.print("step_counter:        "); Serial.println(step_counter);
+      Serial.println("-- end Find correct steps to move the Jar");
+    #endif
     //delay(100);
     if (stop == false) {
       delay(10);
@@ -578,6 +611,7 @@ void move_jar() {
   #endif
   move_jar_done = false;
   step_counter = 0;
+  step_speed = step_speed_run; 
   if (change_rotation) {digitalWrite(DIRECTION_PIN, HIGH);}
   else {digitalWrite(DIRECTION_PIN, LOW);}
   while (step_counter < step_counter_value / 4 and stop == false) {make_step();}
@@ -884,6 +918,13 @@ void setup() {
   pinMode(STEP_PIN, OUTPUT);
   pinMode(DIRECTION_PIN, OUTPUT);
   pinMode(SWITCH, INPUT_PULLDOWN);
+  #ifdef DEBUG_INI
+    Serial.println("-- Pin status:");
+    Serial.print("STEP_PIN:     "); Serial.println(digitalRead(STEP_PIN));
+    Serial.print("DIRECTION_PIN:"); Serial.println(digitalRead(DIRECTION_PIN));
+    Serial.print("SWITCH:       "); Serial.println(digitalRead(SWITCH));
+    Serial.println("-- end Pin status:");
+  #endif
   readPreferences();
   //Boot scsreen
   #if USE_DISPLAY == 1
@@ -910,10 +951,27 @@ void setup() {
     gfx->setFont(Punk_Mono_Bold_200_125);
     gfx->print("Serup Servo:");
   #endif
+  //set DP servo speed to 0 (max speed)
+  int servo_speed_old = servo_speed;
+  servo_speed = 0;
+  #ifdef DEBUG_INI
+    Serial.println("-- Servo speed to 0:");
+    Serial.print("servo_speed_old: "); Serial.println(servo_speed_old);
+    Serial.print("servo_speed:     "); Serial.println(servo_speed);
+    Serial.println("-- end Servo speed to 0:");
+  #endif
   servo.attach(servo_pin, 1000, 2000);
   SERVO_WRITE(90);
   delay(500);
   close_drop_protection(0);
+  //set DP servo speed to preverences value
+  int servo_speed = servo_speed_old;
+  #ifdef DEBUG_INI
+    Serial.println("-- Servo speed to prev. value:");
+    Serial.print("servo_speed_old: "); Serial.println(servo_speed_old);
+    Serial.print("servo_speed:     "); Serial.println(servo_speed);
+    Serial.println("-- end Servo speed to prev. value:");
+  #endif
   #if USE_DISPLAY == 1
     gfx->setCursor(320 - 2 * 16, 60);
     gfx->print("ok");
@@ -924,11 +982,15 @@ void setup() {
   esp_wifi_set_channel(channel, WIFI_SECOND_CHAN_NONE);
   //change mac address
   #if CHANGE_MAC_ADDRESS_TT == 1
+    #ifdef DEBUG
+      Serial.println("-- Change MAC adress:");
+    #endif
     uint8_t newMACAddress[] = {0x74, 0x00, 0x00, 0x00, 0x00, 0x02};
     esp_err_t err = esp_wifi_set_mac(WIFI_IF_STA, &newMACAddress[0]);
     #ifdef DEBUG
       if (err == ESP_OK) {Serial.println("Success changing Mac Address");}
       else {Serial.println("Fail changing Mac Address");}
+      Serial.println("-- end Change MAC adress:");
     #endif
   #endif
   if (esp_now_init() == ESP_OK) {
@@ -1110,61 +1172,61 @@ void loop() {
     else if (strcmp(myReceivedMessage.text, "speed_init_save") == 0) {
       update_display();
       preferences.putUInt("step_speed_init", myReceivedMessage.value);
-      step_speed_init = myReceivedMessage.value;
+      readPreferences();
       delESPnowArrays();
       strcpy(myMessageToBeSent.text, "ok_speed_init_save");
-      myMessageToBeSent.value = servo_speed;
+      myMessageToBeSent.value = step_speed_init;
       sendMessage();
     }
     else if (strcmp(myReceivedMessage.text, "speed_run_save") == 0) {
       update_display();
       preferences.putUInt("step_speed_run", myReceivedMessage.value);
-      step_speed_run = myReceivedMessage.value;
+      readPreferences();
       delESPnowArrays();
       strcpy(myMessageToBeSent.text, "ok_speed_run_save");
-      myMessageToBeSent.value = servo_speed;
+      myMessageToBeSent.value = step_speed_run;
       sendMessage();
     }
     else if (strcmp(myReceivedMessage.text, "pos_jar_steps_save") == 0) {
       update_display();
       preferences.putUInt("step_center_jar", myReceivedMessage.value);
-      step_center_jar = myReceivedMessage.value;
+      readPreferences();
       delESPnowArrays();
       strcpy(myMessageToBeSent.text, "ok_pos_jar_steps_save");
-      myMessageToBeSent.value = servo_speed;
+      myMessageToBeSent.value = step_center_jar;
       sendMessage();
     }
     else if (strcmp(myReceivedMessage.text, "ts_angle_min_save") == 0) {
       update_display();
       preferences.putUInt("servo_min", myReceivedMessage.value);
-      servo_min = myReceivedMessage.value;
+      readPreferences();
       delESPnowArrays();
       strcpy(myMessageToBeSent.text, "ok_ts_angle_min_save");
-      myMessageToBeSent.value = servo_speed;
+      myMessageToBeSent.value = servo_min;
       sendMessage();
     }
     else if (strcmp(myReceivedMessage.text, "ts_angle_max_save") == 0) {
       update_display();
       preferences.putUInt("servo_max", myReceivedMessage.value);
-      servo_max = myReceivedMessage.value;
+      readPreferences();
       delESPnowArrays();
       strcpy(myMessageToBeSent.text, "ok_ts_angle_max_save");
-      myMessageToBeSent.value = servo_speed;
+      myMessageToBeSent.value = servo_max;
       sendMessage();
     }
     else if (strcmp(myReceivedMessage.text, "ts_waittime_save") == 0) {
       update_display();
       preferences.putUInt("servo_wait", myReceivedMessage.value);
-      servo_wait = myReceivedMessage.value;
+      readPreferences();
       delESPnowArrays();
       strcpy(myMessageToBeSent.text, "ok_ts_waittime_save");
-      myMessageToBeSent.value = servo_speed;
+      myMessageToBeSent.value = servo_wait;
       sendMessage();
     }
     else if (strcmp(myReceivedMessage.text, "ts_speed_save") == 0) {
       update_display();
       preferences.putUInt("servo_speed", myReceivedMessage.value);
-      servo_speed = myReceivedMessage.value;
+      readPreferences();
       delESPnowArrays();
       strcpy(myMessageToBeSent.text, "ok_ts_speed_save");
       myMessageToBeSent.value = servo_speed;
