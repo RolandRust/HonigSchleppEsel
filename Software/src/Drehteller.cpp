@@ -16,7 +16,8 @@ String version = "0.0.1";
 #define USE_INIT_CORR 1             // 0 = no init correctur, 1 = init correctur (can be usefull if the gear is 3D ptinted)
 #define CHANGE_MAC_ADDRESS_HM 1     // HaniMandl: 0 = do not change the mac address, 1 = change the mac address
 #define CHANGE_MAC_ADDRESS_TT 1     // Turntable: 0 = do not change the mac address, 1 = change the mac address
-#define OTA_UPDATE 0                // 0: OTA update disabled, 1: OTA update enabled
+#define OTA_UPDATE 1                // 0: OTA update disabled, 1: OTA update enabled
+#define SWITCH_TYPE 1               // 0: Mechanical switch, 1: Optical switch
 
 Preferences preferences;
 
@@ -87,7 +88,11 @@ int channel = 1;  //default channel if ESPNOW don't connect with a acces point
 #endif
 
 //Pin Positionsswitch
-int SWITCH = 16;
+#if SWITCH_TYPE == 0
+  int SWITCH = 16;
+#else
+  int SWITCH = 22;
+#endif
 
 bool stepper_init_done = false;           //has to be true that the turntable works
 bool move_jar_done = false;               //Flag to check move jar is done
@@ -154,11 +159,11 @@ int get_lenght(int i) {
   int myReceivedMessageValueOld = -999;
   char myMessageToBeSentTextOld[64];
   int myMessageToBeSentValueOld = -999;
-  bool stepper_init_done_old;
+  int stepper_init_done_old = -999;
   int step_speed_init_old = -999; 
   int step_speed_run_old = -999;
   int step_center_jar_old = -999;
-  bool drop_protection_old;
+  int drop_protection_old = -999;
   int servo_min_old = -999; 
   int servo_max_old = -999;
   int servo_speed_old = -999; 
@@ -231,7 +236,8 @@ void update_display_init() {
       gfx->print(stepper_init_done_old);
       i = get_lenght(stepper_init_done);
       gfx->setCursor(145 - 9 * i, 150);
-      if (stepper_init_done == 1) {gfx->setTextColor(GREEN);}
+      if (turntable_init_check == false) {gfx->setTextColor(BLUE);}
+      else if (stepper_init_done == 1) {gfx->setTextColor(GREEN);}
       else {gfx->setTextColor(RED);}
       gfx->print(stepper_init_done);
       stepper_init_done_old = stepper_init_done;
@@ -428,12 +434,13 @@ void messageReceived(const uint8_t* macAddr, const uint8_t* incomingData, int le
   if (strcmp(myReceivedMessage.text, "stop") == 0) {
     esp_now_msg_recived = false;
     stop = true;
-    turntable_init_check = true;
+    //turntable_init_check = true;
   }
   #ifdef DEBUG
     Serial.print("myReceivedMessage.text: Text: "); Serial.print(myReceivedMessage.text); Serial.print(" - Value: "); Serial.println(myReceivedMessage.value);
-    Serial.print("esp_now_msg_recived: "); Serial.println(esp_now_msg_recived);
-    Serial.print("stepper_init_done: "); Serial.println(stepper_init_done);
+    Serial.print("esp_now_msg_recived:          "); Serial.println(esp_now_msg_recived);
+    Serial.print("stepper_init_done:            "); Serial.println(stepper_init_done);
+    Serial.print("turntable_init_check:         "); Serial.println(turntable_init_check);
   #endif
 }
 
@@ -553,11 +560,14 @@ void stepper_init() {
         int a3 = counter2 - counter3;
         #ifdef DEBUG
           Serial.print("i = "); Serial.println(i);
+          Serial.print("counter1 = "); Serial.println(counter1);
+          Serial.print("counter2 = "); Serial.println(counter2);
+          Serial.print("counter3 = "); Serial.println(counter3);
           Serial.print("a1 = "); Serial.println(a1);
           Serial.print("a2 = "); Serial.println(a2);
           Serial.print("a3 = "); Serial.println(a3);
         #endif
-        if (abs(a1) <= 200 and abs(a2) <= 200 and abs(a3) <= 200) {
+        if (abs(a1) <= 200 and abs(a2) <= 200 and abs(a3) <= 200 and counter1 > 500 and counter2 > 500 and counter3 > 500) {   //500 ist der Wert vom counter wenn der Stepper nicht dreht
           step_counter_value = (counter1 + counter2 + counter3) / 3;
           stepper_init_done = true;
           i = 12;
@@ -584,9 +594,9 @@ void stepper_init() {
       if(digitalRead(SWITCH) == 1) {
         step_counter = 0;
         while (step_counter < step_counter_value / 90) {make_step();}  //90: Dreht 1/3° mehr zurück
-        Serial.print("fail: ");
-        if (digitalRead(SWITCH) == 0) {Serial.println("solved");}
-        else {Serial.println("not solved");}
+        //Serial.print("fail: ");
+        //if (digitalRead(SWITCH) == 0) {Serial.println("solved");}
+        //else {Serial.println("not solved");}
       }
     #endif
     step_speed = step_speed_run;
@@ -917,7 +927,11 @@ void setup() {
   //set default imnputs and read preverences
   pinMode(STEP_PIN, OUTPUT);
   pinMode(DIRECTION_PIN, OUTPUT);
-  pinMode(SWITCH, INPUT_PULLDOWN);
+  #if SWITCH_TYPE == 0
+    pinMode(SWITCH, INPUT_PULLDOWN);
+  #else
+    pinMode(SWITCH, INPUT_PULLUP);
+  #endif
   #ifdef DEBUG_INI
     Serial.println("-- Pin status:");
     Serial.print("STEP_PIN:     "); Serial.println(digitalRead(STEP_PIN));
@@ -1033,7 +1047,7 @@ void setup() {
     #endif
     stepper_init();
     #if USE_DISPLAY == 1
-      if (stepper_init_done = true) {
+      if (stepper_init_done == true) {
         gfx->setCursor(320 - 2 * 16, 100);
         gfx->print("ok");
       }
@@ -1051,8 +1065,11 @@ void setup() {
       esp_wifi_get_mac(WIFI_IF_STA, baseMac);
       char mac_adress[30];
       sprintf(mac_adress, "%02x:%02x:%02x:%02x:%02x:%02x", baseMac[0], baseMac[1], baseMac[2], baseMac[3], baseMac[4], baseMac[5]);
-      gfx->setCursor((320 - 17 * 14) / 2, 65);
-      gfx->print(mac_adress);
+      char ausgabe[30];
+      sprintf(ausgabe, "%s/%i", mac_adress, channel);
+      if (channel <= 9) {gfx->setCursor((320 - 19 * 14) / 2, 65);}
+      else {gfx->setCursor((320 - 20 * 14) / 2, 65);}
+      gfx->print(ausgabe);
       gfx->setFont(Punk_Mono_Bold_160_100);
       gfx->drawLine(0, 85, 320, 85, TEXT);
       gfx->setCursor(10, 105);
@@ -1325,10 +1342,12 @@ void loop() {
       }
     #endif
   }
-  if (stepper_init_done == false and move2pos_running == false and strcmp(myReceivedMessage.text, "check") != 0) {
+  if (stepper_init_done == false and move2pos_running == false and strcmp(myReceivedMessage.text, "check") != 0 and turntable_init_check == true) {
     #ifdef DEBUG
-      Serial.print("stepper_init_done: "); Serial.println(stepper_init_done);
-      Serial.print("move2pos_running: "); Serial.println(move2pos_running);
+      Serial.print("stepper_init_done:    "); Serial.println(stepper_init_done);
+      Serial.print("move2pos_running:     "); Serial.println(move2pos_running);
+      Serial.print("myReceivedMessage:    "); Serial.println(myReceivedMessage.text);
+      Serial.print("turntable_init_check: "); Serial.println(turntable_init_check);
     #endif
     delESPnowArrays();
     strcpy(myMessageToBeSent.text, "init_error");
