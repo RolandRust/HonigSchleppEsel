@@ -1,6 +1,8 @@
 # Hardware
 ## Bottom middle assembly
 ![bottom_middle](./Pictures/3D-Parts/Bottom_Middle.JPG)
+## Bottom middle optical switch assemblx
+![bottom_middle_optischer_endschalter](./Pictures/3D-Parts/Bottom_Middle_Optischer_Endschalter.JPG)
 ### Bottom_Middle
 ![bottom_middle](./Pictures/3D-Parts/Bottom_Middle/Bottom_Middle.JPG)
 ### Bottom_Middle_Optischer_Schalter
@@ -59,8 +61,10 @@
 ### Wall_Inside_V2
 ![wall_outside](./Pictures/3D-Parts/Wall_Outside/Wall_Outside_V2.JPG)
 
-## 	Top
+## 	Top assembly
 ![top](./Pictures/3D-Parts/Top.JPG)
+## 	Top_30mm assembly
+![top_30mm](./Pictures/3D-Parts/Top_30mm.JPG)
 ### Top_Mittelteil_Drehelement
 ![top](./Pictures/3D-Parts/Top/Top_Mittelteil_Drehelement.JPG)
 ### Top_Jar_Mover_1
