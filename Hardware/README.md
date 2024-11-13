@@ -3,6 +3,16 @@
 ![bottom_middle](./Pictures/3D-Parts/Bottom_Middle.JPG)
 ### Bottom_Middle
 ![bottom_middle](./Pictures/3D-Parts/Bottom_Middle/Bottom_Middle.JPG)
+### Bottom_Middle_Optischer_Schalter
+![bottom_middle_optischer_schalter](./Pictures/3D-Parts/Bottom_Middle/Bottom_Middle_Optischer_Schalter.JPG)
+### Mittelteil_Addon_30mm
+![mittelteil_addon_30mm](./Pictures/3D-Parts/Bottom_Middle/Mittelteil_Addon_30mm.JPG)
+### Umbau_zu_Optischem_Switch_Teil_1
+![umbau_zu_optischem_switch_teil_1](./Pictures/3D-Parts/Bottom_Middle/Umbau_zu_Optischem_Switch_Teil_1.JPG)
+### Umbau_zu_Optischem_Switch_Teil_2
+![umbau_zu_optischem_switch_teil_2](./Pictures/3D-Parts/Bottom_Middle/Umbau_zu_Optischem_Switch_Teil_2.JPG)
+### Umbau_zu_Optischem_Switch_Teil_3
+![umbau_zu_optischem_switch_teil_3](./Pictures/3D-Parts/Bottom_Middle/Umbau_zu_Optischem_Switch_Teil_3.JPG)
 ### Mittelteil_Drehelement
 ![bottom_middle](./Pictures/3D-Parts/Bottom_Middle/Mittelteil_Drehelement.JPG)
 ### HTD3_80_6.5
@@ -59,6 +69,8 @@
 ![top](./Pictures/3D-Parts/Top/Top_Jar_Mover_2.JPG)
 ### Top_Holm
 ![top](./Pictures/3D-Parts/Top/Top_Holm.JPG)
+### Top_Holm_30mm
+![top_holm_30mm](./Pictures/3D-Parts/Top/Top_Holm_30mm.JPG)
 
 ## 	Front box
 ![front_box](./Pictures/3D-Parts/Front.JPG)
