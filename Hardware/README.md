@@ -1,7 +1,7 @@
 # Hardware
 ## Bottom middle assembly
 ![bottom_middle](./Pictures/3D-Parts/Bottom_Middle.JPG)
-## Bottom middle optical switch assemblx
+## Bottom middle optical switch assembly
 ![bottom_middle_optischer_endschalter](./Pictures/3D-Parts/Bottom_Middle_Optischer_Endschalter.JPG)
 ### Bottom_Middle
 ![bottom_middle](./Pictures/3D-Parts/Bottom_Middle/Bottom_Middle.JPG)
