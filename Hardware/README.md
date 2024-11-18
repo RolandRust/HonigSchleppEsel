@@ -17,6 +17,8 @@
 ![umbau_zu_optischem_switch_teil_3](./Pictures/3D-Parts/Bottom_Middle/Umbau_zu_Optischem_Switch_Teil_3.JPG)
 ### Mittelteil_Drehelement
 ![bottom_middle](./Pictures/3D-Parts/Bottom_Middle/Mittelteil_Drehelement.JPG)
+### Mittelteil_Drehelement_Optischer_Endschalter
+![bottom_middle](./Pictures/3D-Parts/Bottom_Middle/Mittelteil_Drehelement_Optischer_Endschalter.JPG)
 ### HTD3_80_6.5
 ![bottom_middle](./Pictures/3D-Parts/Bottom_Middle/HTD3_80_6.5.JPG)
 
